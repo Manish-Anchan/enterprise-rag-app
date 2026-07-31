@@ -1,55 +1,8 @@
 __pycache__/
-*.py[cod]
-*$py.class
 
-
-*.so
 
 
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-
-*.manifest
-*.spec
-
-
-pip-log.txt
-pip-delete-this-directory.txt
-
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.pycover
-.hypothesis/
-.pytest_cache/
-cover/
-
-
-.ipynb_checkpoints
-
 
 .env
 .venv
@@ -66,17 +19,7 @@ processed_data/
 .logfire/
 *.log
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
 # IDEs
 .vscode/
-.idea/
-*.swp
-*.swo
+
