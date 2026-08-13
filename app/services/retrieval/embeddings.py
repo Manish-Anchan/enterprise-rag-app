@@ -5,13 +5,12 @@ from app.config import settings
 
 BATCH_SIZE = 50
 _GEMINI_DIM = 3072
-_FALLBACK_DIM = 768  # all-mpnet-base-v2
+_FALLBACK_DIM = 768  
 
 _active_model = None
-_model_type: str | None = None  # "gemini" or "fallback"
+_model_type: str | None = None  
 
 
-# ── Model initialisation ───────────────────────────────────────────────────────
 
 def _probe_gemini():
     """Try one embed call to verify Gemini is reachable. Returns model or None."""
@@ -28,11 +27,6 @@ def _probe_gemini():
         return None
 
 
-# def _load_fallback():
-#     from sentence_transformers import SentenceTransformer
-#     logfire.info("Loading sentence-transformers fallback (all-mpnet-base-v2, 768-dim).")
-#     return SentenceTransformer("all-mpnet-base-v2")
-
 
 def _init():
     """Initialise embedding model once per process. Called lazily on first use."""
@@ -45,11 +39,13 @@ def _init():
         _active_model = gemini
         _model_type = "gemini"
     else:
-        _active_model = None
-        _model_type = "fallback"
+        raise RuntimeError(
+            "Gemini embedding service is unavailable. "
+            "Please check your GEMINI_API_KEY in .env and ensure it is valid. "
+            "See .env.example for the required configuration."
+        )
 
 
-# ── Public helpers ─────────────────────────────────────────────────────────────
 
 def get_embedding_dim() -> int:
     """Return the vector dimension for the active model. Call after _init()."""
@@ -61,7 +57,6 @@ def get_embedding_dim() -> int:
 
 def _embed_batch(batch: list[str]) -> list[list[float]]:
     if _model_type == "gemini":
-        # Exponential backoff: 1 s → 2 s → 4 s → 8 s (4 attempts total)
         for attempt in range(4):
             try:
                 return _active_model.embed_documents(batch)
@@ -83,7 +78,6 @@ def _embed_batch(batch: list[str]) -> list[list[float]]:
         return _active_model.encode(batch, show_progress_bar=False).tolist()
 
 
-# ── Public API (same signatures as before) ─────────────────────────────────────
 
 def embed_query(query: str) -> list[float]:
     _init()

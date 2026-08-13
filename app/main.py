@@ -1,7 +1,3 @@
-# ============================================================
-# CRITICAL: logfire MUST be configured before ALL other imports
-# so that spans from all modules are captured from the start.
-# ============================================================
 import logfire
 import os
 from dotenv import load_dotenv
@@ -9,31 +5,57 @@ from dotenv import load_dotenv
 load_dotenv()
 logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
-# Now safe to import app modules - logfire is already active
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, HTTPException
 from app.agents.graph import rag_agent
-# from app.guardrails import initialize_rails, guard
+from app.guardrails import initialize_rails, guard
 
 from pydantic import BaseModel
 from typing import Optional
+from contextlib import asynccontextmanager
 
-
-# Initialize FastAPI
-app = FastAPI(title="Enterprise Agentic RAG API")
-
-
-# @app.on_event("startup")
-# def startup_event():
-#     initialize_rails()
 
 class QueryRequest(BaseModel):
     q: str
     thread_id: Optional[str] = "default_user"
     
-    
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler for FastAPI startup and shutdown."""
+    initialize_rails()
+    yield
+
+
+
+
+app = FastAPI(
+    title="NovaTech KnowledgeHub API",
+    description="AI-powered internal knowledge base for NovaTech Solutions",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+
+
+
 @app.get("/")
 def home():
-    return {"message": "Enterprise LangGraph RAG API is live."}
+    return {"message": "NovaTech KnowledgeHub API is live.", "status": "healthy"}
+
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for monitoring and container orchestration."""
+    return {
+        "status": "healthy",
+        "service": "NovaTech KnowledgeHub",
+        "components": {
+            "api": "up",
+            "guardrails": "enabled",
+            "agent": "ready",
+        }
+    }
 
 
 @app.get("/graph")
@@ -41,17 +63,22 @@ def get_graph_image():
     """
     Returns the Mermaid image of the agent's workflow.
     """
+    from fastapi import Response
     try:
         png_bytes = rag_agent.get_graph().draw_mermaid_png()
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
-        return {"error": f"Could not generate graph image: {e}"}
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not generate graph image: {e}"
+        )
     
     
 @app.post("/query")
 def query(request: QueryRequest):
     """
     Executes the LangGraph RAG flow with memory using a POST request.
+    Input is first evaluated against NeMo Guardrails before reaching the pipeline.
     """
     q = request.q
     thread_id = request.thread_id
@@ -64,24 +91,21 @@ def query(request: QueryRequest):
         "status": "Initializing Graph..."
     }
     
-    # Configuration for Memory (Thread ID)
+
     config = {"configurable": {"thread_id": thread_id}}
     
     try:
-        # Gate 1: NeMo Guardrails — blocks off-topic, jailbreaks, and handles dialog
-        # rail_fired, rail_response = guard(q)
-        # if rail_fired:
-        #     logfire.info(f"🛡️ Request blocked by guardrails | thread={thread_id}")
-        #     return {
-        #         "question": q,
-        #         "answer": rail_response,
-        #         "thought_process": ["Intent: Guardrails Fired", "Retrieval: Skipped"],
-        #         "status": "Blocked by guardrails.",
-        #         "sources": []
-        #     }
+        rail_fired, rail_response = guard(q)
+        if rail_fired:
+            logfire.info(f"🛡️ Request blocked by guardrails | thread={thread_id}")
+            return {
+                "question": q,
+                "answer": rail_response,
+                "thought_process": ["🛡️ Guardrails Activated", "Query blocked by safety filters"],
+                "status": "Blocked by guardrails.",
+                "sources": []
+            }
 
-        # Gate 2: LangGraph RAG pipeline
-        # Run the graph synchronously to preserve Logfire context variables
         final_output = rag_agent.invoke(initial_state, config=config)
         
         return {
@@ -93,10 +117,13 @@ def query(request: QueryRequest):
         }
     except Exception as e:
         logfire.error(f"❌ Backend Execution Failed: {e}")
-        return {
-            "question": q,
-            "answer": "I apologize, but I encountered an internal error while processing your request. Please try again later.",
-            "thought_process": ["Error encountered during execution."],
-            "status": "error",
-            "sources": []
-        }
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "question": q,
+                "answer": "I apologize, but I encountered an internal error while processing your request. Please try again later.",
+                "thought_process": ["Error encountered during execution."],
+                "status": "error",
+                "sources": []
+            }
+        )

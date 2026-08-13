@@ -1,30 +1,40 @@
-# --- CORE API & WEB FRAMEWORK ---
-fastapi                     # High-performance web framework for the API
-uvicorn[standard]           # ASGI server to run the FastAPI app
-python-dotenv               # For loading configuration from .env files
-requests                    # HTTP library for internal/external API calls
-streamlit                   # Frontend dashboard for the chat interface
-numpy                       # Numerical processing
+fastapi>=0.110.0            
+uvicorn[standard]>=0.27.0  
+python-dotenv>=1.0.0        
+requests>=2.31.0            
+streamlit>=1.30.0           # Frontend chat dashboard
+numpy>=1.26.0               # Numerical processing for embeddings
 
-# --- GEMINI EMBEDDINGS ---
-google-generativeai         # Gemini API — embeddings (text-embedding-004 / gemini-embedding-001)
-langchain-google-genai      # LangChain integration for Gemini models
+# --- LLM & EMBEDDINGS ---
+langchain-google-genai>=2.0.0   # Gemini embeddings (3072-dim)
+google-generativeai>=0.8.0      # Gemini API client
 
-# --- VECTOR DB & RETRIEVAL ---
-qdrant-client               # Vector Database for semantic search
+# --- VECTOR DATABASE ---
+qdrant-client>=1.7.0        # Qdrant vector search
 
-# --- DATA INGESTION & DOCUMENT PARSING ---
-unstructured                # Base library for DOCX/PPTX partitioning
-python-pptx                 # Parser for PowerPoint files
-python-docx                 # Parser for Word documents
-pypdf                       # Local PDF text extraction (replaces Document AI)
-beautifulsoup4              # High-speed HTML text extraction
-pdfplumber                  # Fallback PDF parser for scanned/complex layouts
+# --- AGENT ORCHESTRATION ---
+langgraph>=0.2.0            # LangGraph state machine for agentic workflow
+langchain-groq>=0.2.0       # Groq LLM integration via LangChain
 
-# --- OBSERVABILITY & DISTRIBUTED TRACING ---
-logfire[fastapi,requests]   # Pydantic Logfire — FastAPI + requests instrumentation
-loguru                      # Enhanced logging for Python
+# --- SEMANTIC RERANKING ---
+flashrank>=0.2.0            # Local ONNX cross-encoder reranker (ms-marco-MiniLM)
 
-langchain_groq
-flashrank
-langgraph
+# --- DOCUMENT INGESTION ---
+unstructured>=0.12.0        # Multi-format document parsing (DOCX, PPTX)
+python-pptx>=0.6.23         # PowerPoint file parser
+python-docx>=1.1.0          # Word document parser
+pypdf>=4.0.0                # PDF text extraction
+beautifulsoup4>=4.12.0      # HTML parsing and cleaning
+pdfplumber>=0.11.0          # Fallback PDF parser for complex layouts
+
+# --- GUARDRAILS & SAFETY ---
+nemoguardrails>=0.10.0      # NVIDIA NeMo Guardrails (jailbreak, off-topic, output safety)
+
+# --- OBSERVABILITY ---
+logfire[fastapi,requests]>=2.0.0  # Pydantic Logfire distributed tracing
+loguru>=0.7.0                     # Structured logging
+
+# --- TESTING ---
+pytest>=8.0.0               # Test framework
+pytest-asyncio>=0.23.0      # Async test support
+httpx>=0.27.0               # Async HTTP client for FastAPI TestClient

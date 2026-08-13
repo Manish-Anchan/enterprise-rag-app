@@ -19,8 +19,12 @@ workflow.add_node("responder", generate_node)
 def route_planner(state: AgentState):
     """
     Routes the workflow based on the planner's decision.
+    - CONVERSATIONAL: Skip retrieval, go straight to responder (uses memory)
+    - OUT_OF_SCOPE: Skip retrieval, responder gives a redirect message
+    - Anything else: Technical query, needs retrieval first
     """
-    if state["current_query"] == "CONVERSATIONAL":
+    query = state["current_query"]
+    if query in ("CONVERSATIONAL", "OUT_OF_SCOPE"):
         return "responder"
     return "retriever"
 
@@ -42,12 +46,9 @@ workflow.add_edge("retriever", "responder")
 workflow.add_edge("responder", END)
 
 
-# --- MEMORY UPGRADE ---
-# MemorySaver allows the agent to remember conversations based on 'thread_id'
+# --- MEMORY ---
 checkpointer = MemorySaver()
 
 
 # 4. Compile the Graph with Memory
 rag_agent = workflow.compile(checkpointer=checkpointer)
-
-

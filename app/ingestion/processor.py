@@ -16,7 +16,6 @@ from app.ingestion.chunking.splitter import chunk_text
 
 logfire.configure(service_name="enterprise-ingestion-service")
 
-# Local folder where parsed + chunked JSON metadata is saved (replaces GCS processed bucket)
 PROCESSED_DATA_DIR = "processed_data"
 
 # Initialize Qdrant Client
@@ -46,7 +45,7 @@ def process_file(file_path: str, filename: str, source_type: str):
                 full_text = parse_pdf(file_path)
             elif ext in ("html", "htm"):
                 full_text = parse_html(file_path)
-            elif ext == "txt":
+            elif ext in ("txt", "md"):
                 full_text = parse_text(file_path)
             elif ext in ("docx", "pptx"):
                 from app.ingestion.loaders.office import parse_office
@@ -166,9 +165,6 @@ def run_universal_ingestion(base_dir: str, explicit_source_type: str = None, wip
 
 
 if __name__ == "__main__":
-    # Usage:
-    #   python -m app.ingestion.processor DATA --wipe
-    #   python -m app.ingestion.processor DATA/true_data true
     wipe_requested = "--wipe" in sys.argv
     clean_args = [a for a in sys.argv if a != "--wipe"]
 

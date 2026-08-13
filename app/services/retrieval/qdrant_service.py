@@ -19,12 +19,11 @@ def search_enterprise_knowledge(query: str, limit: int = 8):
     try:
         query_vector = embed_query(query)
 
-        # Using query_points - the modern standard for Qdrant
         response = client.query_points(
             collection_name=settings.QDRANT_COLLECTION,
             query=query_vector,
             limit=limit,
-            with_payload=True # JSON
+            with_payload=True 
         )
 
         results = []
