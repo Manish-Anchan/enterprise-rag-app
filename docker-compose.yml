@@ -21,19 +21,14 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ── Streamlit Frontend ───────────────────────────────────
+  # ── React Frontend ───────────────────────────────────────
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: knowledgehub-ui
-    command: streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0
     ports:
-      - "8501:8501"
-    env_file:
-      - .env
-    environment:
-      - BACKEND_URL=http://backend:8080
+      - "5173:80"
     depends_on:
       backend:
         condition: service_healthy

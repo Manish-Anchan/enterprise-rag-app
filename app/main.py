@@ -29,11 +29,21 @@ async def lifespan(app: FastAPI):
 
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="NovaTech KnowledgeHub API",
     description="AI-powered internal knowledge base for NovaTech Solutions",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

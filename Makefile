@@ -10,14 +10,14 @@ install: ## Install all dependencies
 run-backend: ## Start the FastAPI backend server
 	uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 
-run-ui: ## Start the Streamlit frontend
-	streamlit run ui/app.py
+run-ui: ## Start the React frontend
+	cd frontend && npm run dev
 
-run: ## Start both backend and frontend (backend in background)
-	@echo "Starting backend..."
+run: ## Start both backend and frontend
+	@echo "Starting backend on :8080..."
 	uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload &
-	@echo "Starting frontend..."
-	streamlit run ui/app.py
+	@echo "Starting React frontend on :5173..."
+	cd frontend && npm run dev
 
 ingest: ## Ingest documents from DATA/ directory
 	python -m app.ingestion.processor DATA --wipe

@@ -6,28 +6,31 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "ui/app.py"
+        "app/main.py"
       ]
     },
     "vscode": {
       "settings": {},
       "extensions": [
         "ms-python.python",
-        "ms-python.vscode-pylance"
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint"
       ]
     }
   },
-  "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; [ -f requirements.txt ] && pip3 install --user -r requirements.txt; pip3 install --user streamlit; echo '✅ Packages installed and Requirements met'",
-  "postAttachCommand": {
-    "server": "streamlit run ui/app.py --server.enableCORS false --server.enableXsrfProtection false"
-  },
+  "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; [ -f requirements.txt ] && pip3 install --user -r requirements.txt; cd frontend && npm install; echo '✅ Dependencies ready'",
   "portsAttributes": {
-    "8501": {
-      "label": "Application",
+    "5173": {
+      "label": "React Frontend",
       "onAutoForward": "openPreview"
+    },
+    "8080": {
+      "label": "FastAPI Backend",
+      "onAutoForward": "silent"
     }
   },
   "forwardPorts": [
-    8501
+    5173,
+    8080
   ]
 }

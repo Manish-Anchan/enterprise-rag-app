@@ -20,11 +20,10 @@ COPY --from=builder /install /usr/local
 
 COPY app/ ./app/
 COPY DATA/ ./DATA/
-COPY ui/ ./ui/
 
 RUN mkdir -p processed_data
 
-EXPOSE 8080 8501
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" || exit 1
