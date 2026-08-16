@@ -111,7 +111,9 @@ export default function App() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      setBackendStatus({ status: 'healthy' });
     } catch (err) {
+      setBackendStatus({ status: 'offline' });
       const errorMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

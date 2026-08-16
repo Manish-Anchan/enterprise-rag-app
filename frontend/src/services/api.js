@@ -4,33 +4,55 @@ const rawUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 const API_BASE_URL = rawUrl.replace(/\/+$/, '');
 
 export async function checkBackendHealth() {
+  // 1. Try direct /health
   try {
     const response = await fetch(`${API_BASE_URL}/health`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return {
-      status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
-      data
-    };
-  } catch (error) {
-    // Try proxy endpoint if direct fails
-    try {
-      const proxyRes = await fetch('/api/health');
-      if (proxyRes.ok) {
-        const data = await proxyRes.json();
-        return {
-          status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
-          data
-        };
-      }
-    } catch {
-      // ignore
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
+        data
+      };
     }
-    return { status: 'offline', error: error.message };
+  } catch {
+    // continue to fallback
   }
+
+  // 2. Try direct / (root endpoint)
+  try {
+    const response = await fetch(`${API_BASE_URL}/`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        status: data.status === 'healthy' ? 'healthy' : 'degraded',
+        data
+      };
+    }
+  } catch {
+    // continue to proxy
+  }
+
+  // 3. Try /api/health proxy
+  try {
+    const proxyRes = await fetch('/api/health');
+    if (proxyRes.ok) {
+      const data = await proxyRes.json();
+      return {
+        status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
+        data
+      };
+    }
+  } catch {
+    // ignore
+  }
+
+  return { status: 'offline', error: 'Failed to reach backend' };
 }
 
 export async function sendQuery(question, threadId) {
