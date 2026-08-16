@@ -2,7 +2,7 @@
 
 > **Your company's brain, instantly searchable** — an AI-powered internal knowledge base built with an agentic RAG pipeline, enterprise guardrails, and production-grade observability.
 
-🌟 **Live Demo:** [NovaTech KnowledgeHub](https://enterprise-rag-app-tech.streamlit.app/)
+🌟 **Live Demo:** [NovaTech KnowledgeHub](https://enterprise-rag-app.vercel.app/)
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
