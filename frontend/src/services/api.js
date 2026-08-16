@@ -1,6 +1,7 @@
 // API service for NovaTech KnowledgeHub backend
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const rawUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const API_BASE_URL = rawUrl.replace(/\/+$/, '');
 
 export async function checkBackendHealth() {
   try {
@@ -9,12 +10,22 @@ export async function checkBackendHealth() {
       headers: { 'Content-Type': 'application/json' },
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
+    const data = await response.json();
+    return {
+      status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
+      data
+    };
   } catch (error) {
     // Try proxy endpoint if direct fails
     try {
       const proxyRes = await fetch('/api/health');
-      if (proxyRes.ok) return await proxyRes.json();
+      if (proxyRes.ok) {
+        const data = await proxyRes.json();
+        return {
+          status: (data.status === 'healthy' || data.components?.api === 'up') ? 'healthy' : 'degraded',
+          data
+        };
+      }
     } catch {
       // ignore
     }

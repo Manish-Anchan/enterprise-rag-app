@@ -99,7 +99,7 @@ export default function Sidebar({
               </span>
               <Badge variant={isOnline ? "success" : "neutral"} className="text-[10px] py-0 px-2">
                 <span className={`h-1.5 w-1.5 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-400'}`} />
-                {isOnline ? 'Live :8080' : 'Offline'}
+                {isOnline ? 'Online' : 'Offline'}
               </Badge>
             </div>
 
