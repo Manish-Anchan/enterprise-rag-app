@@ -6,52 +6,52 @@ import {
   Lock, 
   UserCheck, 
   TrendingUp, 
-  ArrowUpRight, 
-  Sparkles 
+  ArrowRight, 
+  Sparkles,
+  Command
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const CATEGORIES = [
   {
     id: 'hr',
-    title: 'HR Policies',
-    desc: 'Remote work, leaves, workplace guidelines',
+    title: 'HR Policies & Leaves',
+    desc: 'Remote work guidelines, PTO schedules, and conduct',
     icon: Briefcase,
     prompt: "What is NovaTech's policy on remote work and flexible core hours?"
   },
   {
     id: 'benefits',
     title: 'Benefits & Compensation',
-    desc: 'Health coverage, 401(k) matching, wellness',
+    desc: 'Health insurance tiers, 401(k) matching, and wellness',
     icon: DollarSign,
     prompt: 'What healthcare plans are offered and what is the 401(k) match?'
   },
   {
     id: 'eng',
     title: 'Engineering Standards',
-    desc: 'Code review, branching, release pipelines',
+    desc: 'Code reviews, PR approvals, CI/CD, and deployment',
     icon: Code2,
     prompt: 'What are the required steps and approvals for code reviews and PR merges?'
   },
   {
     id: 'security',
     title: 'Security & Access',
-    desc: '2FA authentication, VPN, data privacy',
+    desc: '2FA authentication, VPN access, and credential safety',
     icon: Lock,
     prompt: 'What are the mandatory security practices for 2FA and remote VPN access?'
   },
   {
     id: 'onboard',
     title: 'New Hire Onboarding',
-    desc: 'First week checklist, account setup',
+    desc: 'Day-1 account checklist, mentor pairing, and tools',
     icon: UserCheck,
     prompt: 'What should a new employee complete during their first week of onboarding?'
   },
   {
     id: 'perf',
     title: 'Performance & Growth',
-    desc: 'Review cadence, engineering ladder',
+    desc: 'Quarterly reviews, promotions, and engineering ladder',
     icon: TrendingUp,
     prompt: 'How are performance reviews conducted and what is the promotion criteria?'
   }
@@ -65,57 +65,64 @@ const SUGGESTIONS = [
 
 export default function EmptyState({ onSelectPrompt }) {
   return (
-    <div className="py-6 space-y-8 max-w-2xl mx-auto">
+    <div className="py-8 md:py-12 space-y-9 max-w-2xl mx-auto">
       {/* Hero Header */}
-      <div className="space-y-3">
-        <Badge variant="outline" className="gap-1.5 text-xs text-muted-foreground border-border/80">
-          <Sparkles className="h-3 w-3 text-zinc-400" />
-          Enterprise Knowledge Engine
-        </Badge>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          What can I help you find today?
+      <div className="space-y-3.5">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs text-zinc-300 shadow-sm backdrop-blur-md">
+          <Sparkles className="h-3.5 w-3.5 text-zinc-300 animate-pulse" />
+          <span className="font-medium tracking-wide">Enterprise Knowledge Engine</span>
+        </div>
+        
+        <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-[2rem] leading-tight">
+          How can I assist your workday?
         </h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Ask questions across company documentation, engineering standards, HR policies, and benefits with grounded RAG citations.
+        
+        <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
+          Search across internal company wikis, engineering handbooks, HR policies, and security protocols with grounded citation sources.
         </p>
       </div>
 
-      {/* 6 Category Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* 6 Clean Glass Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         {CATEGORIES.map((cat) => {
           const IconComp = cat.icon;
           return (
-            <Card
+            <div
               key={cat.id}
               onClick={() => onSelectPrompt(cat.prompt)}
-              className="group cursor-pointer border-border/60 hover:border-zinc-500/50 hover:bg-zinc-900/60 transition-all duration-200"
+              className="glass-card rounded-xl p-4.5 cursor-pointer group flex flex-col justify-between space-y-3"
             >
-              <CardHeader className="p-4 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <IconComp className="h-4 w-4 text-zinc-400 group-hover:text-foreground transition-colors" />
-                  <ArrowUpRight className="h-3.5 w-3.5 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-between">
+                <div className="h-8 w-8 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-300 group-hover:text-white group-hover:bg-white/[0.1] transition-all">
+                  <IconComp className="h-4 w-4" />
                 </div>
-                <CardTitle className="text-xs font-medium text-foreground">
+                <ArrowRight className="h-4 w-4 text-zinc-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+              </div>
+              
+              <div className="space-y-1">
+                <h3 className="text-xs font-semibold text-zinc-100 group-hover:text-white tracking-tight">
                   {cat.title}
-                </CardTitle>
-                <CardDescription className="text-[11px] text-muted-foreground">
+                </h3>
+                <p className="text-[11.5px] text-zinc-400 leading-relaxed">
                   {cat.desc}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+                </p>
+              </div>
+            </div>
           );
         })}
       </div>
 
-      {/* Suggested Prompts */}
-      <div className="space-y-2 pt-2">
-        <span className="text-xs font-medium text-muted-foreground">Try asking:</span>
+      {/* Quick Prompts */}
+      <div className="space-y-2.5 pt-1">
+        <span className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
+          <span>Try asking</span>
+        </span>
         <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((sug, idx) => (
             <button
               key={idx}
               onClick={() => onSelectPrompt(sug)}
-              className="text-xs text-zinc-300 bg-zinc-900/80 hover:bg-zinc-800 border border-border/60 rounded-full px-3 py-1.5 transition-colors text-left cursor-pointer"
+              className="text-xs text-zinc-300 bg-white/[0.03] hover:bg-white/[0.08] hover:text-white border border-white/[0.08] hover:border-white/20 rounded-full px-3.5 py-1.5 transition-all duration-150 text-left cursor-pointer shadow-sm active:scale-[0.98]"
             >
               {sug}
             </button>
